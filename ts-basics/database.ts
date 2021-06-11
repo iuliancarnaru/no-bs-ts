@@ -24,7 +24,10 @@ class InMemoryDatabase<T, K extends DBKeyType> implements Database<T, K> {
   }
 }
 
-class PersistentMemoryDB<T, K extends DBKeyType> extends InMemoryDatabase<T, K> implements Persistence {
+class PersistentMemoryDB<T, K extends DBKeyType>
+  extends InMemoryDatabase<T, K>
+  implements Persistence
+{
   saveToString(): string {
     return JSON.stringify(this.db);
   }
