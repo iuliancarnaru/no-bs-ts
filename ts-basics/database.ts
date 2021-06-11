@@ -1,28 +1,30 @@
-interface Database {
-  get(id: string): string;
-  set(id: string, value: string): void;
+interface Database<T, K> {
+  get(id: K): T;
+  set(id: K, value: T): void;
 }
 
-interface Persistance {
+interface Persistence {
   saveToString(): string;
   restoreFromString(storedState: string): void;
 }
 
-class InMemoryDatabase implements Database {
+type DBKeyType = string | number | symbol;
+
+class InMemoryDatabase<T, K extends DBKeyType> implements Database<T, K> {
   // member visibility
   // private db: Record<string, string> = {};
-  protected db: Record<string, string> = {};
+  protected db: Record<K, T> = {} as Record<K, T>;
 
-  get(id: string): string {
+  get(id: K): T {
     return this.db[id];
   }
 
-  set(id: string, value: string): void {
+  set(id: K, value: T): void {
     this.db[id] = value;
   }
 }
 
-class PersistentMemoryDB extends InMemoryDatabase implements Persistance {
+class PersistentMemoryDB<T, K extends DBKeyType> extends InMemoryDatabase<T, K> implements Persistence {
   saveToString(): string {
     return JSON.stringify(this.db);
   }
@@ -31,12 +33,12 @@ class PersistentMemoryDB extends InMemoryDatabase implements Persistance {
   }
 }
 
-const myDB = new PersistentMemoryDB();
-myDB.set('foo', 'bar');
+const myDB = new PersistentMemoryDB<number, string>();
+myDB.set('foo', 205);
 // myDB.db['foo'] = 'baz'; --> Property 'db' is private and only accessible within class 'InMemoryDatabase'.
 console.log(myDB.get('foo'));
 const saved = myDB.saveToString();
 
-const myDB2 = new PersistentMemoryDB();
+const myDB2 = new PersistentMemoryDB<number, string>();
 myDB2.restoreFromString(saved);
 console.log(myDB2.get('foo'));
