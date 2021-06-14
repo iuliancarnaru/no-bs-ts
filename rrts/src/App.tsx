@@ -1,5 +1,9 @@
 import React, {
+  ButtonHTMLAttributes,
+  DetailedHTMLProps,
+  Dispatch,
   FunctionComponent,
+  SetStateAction,
   useCallback,
   useEffect,
   useReducer,
@@ -40,6 +44,38 @@ type ActionType =
   | { type: 'ADD'; text: string }
   | { type: 'REMOVE'; id: number };
 
+const useNumber = (initialValue: number) => useState<number>(initialValue);
+
+type UseNumberValue = ReturnType<typeof useNumber>[0];
+type UseNumberSetValue = ReturnType<typeof useNumber>[1];
+
+const Button: FunctionComponent<
+  DetailedHTMLProps<ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement>
+> & { title?: string } = ({ title, children, style, ...rest }) => (
+  <button
+    {...rest}
+    style={{
+      ...style,
+      backgroundColor: 'red',
+      color: 'white',
+      fontSize: 'large',
+    }}
+  >
+    {title ?? children}
+  </button>
+);
+
+const Incrementer: FunctionComponent<{
+  value: UseNumberValue;
+  setValue: UseNumberSetValue;
+}> = ({ value, setValue }) => (
+  <Button
+    type="button"
+    onClick={() => setValue(value + 1)}
+    title={` Add - ${value}`}
+  />
+);
+
 function App() {
   const [payload, setPayload] = useState<Payload | null>(null);
 
@@ -63,6 +99,7 @@ function App() {
   }, []);
 
   const newTodoRef = useRef<HTMLInputElement>(null);
+
   const onAddTodo = useCallback(() => {
     if (newTodoRef.current) {
       dispatch({
@@ -75,28 +112,32 @@ function App() {
   }, []);
 
   const onListClick = useCallback((item: string) => alert(item), []);
+
+  const [value, setValue] = useState(0);
+
   return (
     <div>
       <Heading title="Introduction" />
       <Box>Hello there</Box>
       <List items={['one', 'two', 'three']} onClick={onListClick} />
       <Box>{JSON.stringify(payload)}</Box>
+      <Incrementer value={value} setValue={setValue} />
 
       <Heading title="Todos" />
       {todos.map((todo) => (
         <div key={todo.id}>
           {todo.text}
-          <button
+          <Button
             type="button"
             onClick={() => dispatch({ type: 'REMOVE', id: todo.id })}
           >
             Remove
-          </button>
+          </Button>
         </div>
       ))}
       <div>
         <input type="text" ref={newTodoRef} />
-        <button onClick={onAddTodo}>Add todo</button>
+        <Button onClick={onAddTodo}>Add</Button>
       </div>
     </div>
   );
