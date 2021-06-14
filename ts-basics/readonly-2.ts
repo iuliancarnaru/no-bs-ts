@@ -9,9 +9,8 @@ console.log(lg.name);
 
 // singleton
 class DogList {
-  private doggies: Doggy[] = [];
-
   static instance: DogList = new DogList();
+  private doggies: Doggy[] = [];
 
   private constructor() {}
 

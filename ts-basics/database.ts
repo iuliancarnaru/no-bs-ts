@@ -1,10 +1,12 @@
 interface Database<T, K> {
   get(id: K): T;
+
   set(id: K, value: T): void;
 }
 
 interface Persistence {
   saveToString(): string;
+
   restoreFromString(storedState: string): void;
 }
 
@@ -31,6 +33,7 @@ class PersistentMemoryDB<T, K extends DBKeyType>
   saveToString(): string {
     return JSON.stringify(this.db);
   }
+
   restoreFromString(storedState: string): void {
     this.db = JSON.parse(storedState);
   }

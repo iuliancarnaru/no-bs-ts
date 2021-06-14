@@ -29,6 +29,7 @@ function makeCat(name: string, breed: string): Readonly<Cat> {
 }
 
 const neko = makeCat('neko', 'british');
+
 // neko.name = 'bacon'; --> Cannot assign to 'name' because it is a read-only property.
 
 function makeCoordinate(
