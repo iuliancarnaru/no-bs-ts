@@ -1,4 +1,10 @@
-import { useCallback, useReducer } from 'react';
+import {
+  useCallback,
+  useReducer,
+  createContext,
+  useContext,
+  FunctionComponent,
+} from 'react';
 
 type ActionType =
   | { type: 'ADD'; text: string }
@@ -10,7 +16,15 @@ interface Todo {
   text: string;
 }
 
-export function useTodos(initialTodos: Todo[]): {
+type UseTodosManagerResult = ReturnType<typeof useTodosManager>;
+
+const TodoContext = createContext<UseTodosManagerResult>({
+  todos: [],
+  addTodo: () => {},
+  removeTodo: () => {},
+});
+
+function useTodosManager(initialTodos: Todo[]): {
   todos: Todo[];
   addTodo: (text: string) => void;
   removeTodo: (id: number) => void;
@@ -49,3 +63,26 @@ export function useTodos(initialTodos: Todo[]): {
 
   return { todos, addTodo, removeTodo };
 }
+
+export const TodosProvider: FunctionComponent<{ initialTodos: Todo[] }> = ({
+  initialTodos,
+  children,
+}) => (
+  <TodoContext.Provider value={useTodosManager(initialTodos)}>
+    {children}
+  </TodoContext.Provider>
+);
+
+export const useTodos = (): Todo[] => {
+  const { todos } = useContext(TodoContext);
+  return todos;
+};
+
+export const useAddTodo = (): UseTodosManagerResult['addTodo'] => {
+  const { addTodo } = useContext(TodoContext);
+  return addTodo;
+};
+export const useRemoveTodo = (): UseTodosManagerResult['removeTodo'] => {
+  const { removeTodo } = useContext(TodoContext);
+  return removeTodo;
+};
