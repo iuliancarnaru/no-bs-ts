@@ -3,6 +3,8 @@ import React, {
   DetailedHTMLProps,
   Dispatch,
   FunctionComponent,
+  HTMLAttributes,
+  ReactNode,
   SetStateAction,
   useCallback,
   useEffect,
@@ -34,6 +36,26 @@ const Button: FunctionComponent<
   </button>
 );
 
+function UL<T>({
+  items,
+  render,
+  itemClick,
+}: DetailedHTMLProps<HTMLAttributes<HTMLUListElement>, HTMLUListElement> & {
+  items: T[];
+  render: (item: T) => ReactNode;
+  itemClick: (item: T) => void;
+}) {
+  return (
+    <ul>
+      {items.map((item, idx) => (
+        <li onClick={() => itemClick(item)} key={idx}>
+          {render(item)}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 function App() {
   const { todos, addTodo, removeTodo } = useTodos([
     {
@@ -57,14 +79,18 @@ function App() {
       <Box>Hello there</Box>
 
       <Heading title="Todos" />
-      {todos.map((todo) => (
-        <div key={todo.id}>
-          {todo.text}
-          <Button type="button" onClick={() => removeTodo(todo.id)}>
-            Remove
-          </Button>
-        </div>
-      ))}
+      <UL
+        itemClick={(item) => alert(item.id)}
+        items={todos}
+        render={(todo) => (
+          <>
+            {todo.text}
+            <Button type="button" onClick={() => removeTodo(todo.id)}>
+              Remove
+            </Button>
+          </>
+        )}
+      />
       <div>
         <input type="text" ref={newTodoRef} />
         <Button onClick={onAddTodo}>Add</Button>
